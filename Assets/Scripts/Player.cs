@@ -1,11 +1,9 @@
-﻿using Unity.Netcode;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
     [SerializeField] private SimpleCharacterMotor characterController;
-    [SerializeField] private float  moveSpeed = 3f;
         
     private InputAction _moveAction;
     private InputAction _lookAction;
@@ -21,7 +19,7 @@ public class Player : MonoBehaviour
     }
 
     public void OnDisable()
-    {
+    { 
         var playerMap = InputSystem.actions.FindActionMap("Player", true);
         playerMap.Disable();
     }
@@ -30,5 +28,9 @@ public class Player : MonoBehaviour
     {
         _moveVelocity = _moveAction.ReadValue<Vector2>();
         characterController.MoveInput = _moveVelocity;
+        
+        _lookVelocity = _lookAction.ReadValue<Vector2>();
+        characterController.LookInput = _lookVelocity;
     }
+    
 }

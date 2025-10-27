@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using Unity.Netcode;
+using UnityEngine;
 
 [DefaultExecutionOrder(-50)]
-public class SimpleCharacterMotor : MonoBehaviour
+public class SimpleCharacterMotor : NetworkBehaviour
 {
     [Header("Shape")]
     [SerializeField] private float height = 2.0f;     // Полная высота капсулы
@@ -11,41 +13,86 @@ public class SimpleCharacterMotor : MonoBehaviour
     [SerializeField] private float speed = 5.0f;      // м/с по XZ
     [SerializeField] private float gravity = -9.81f;  // м/с^2 (отрицательная вниз)
     [SerializeField] private LayerMask collisionMask = ~0; // что считаем препятствиями/землёй
+    
+    [Header("Rotation")]
+    [SerializeField] private float angularSpeed = 5.0f;  
+    [SerializeField] private float yawSmoothTime = 0.06f;    // сглаживание (сек)
+    [SerializeField] private float maxYawSpeed = 1080f;      // макс. скорость (град/с), 0 — без лимита
+      
 
     [Header("Tuning")]
     [SerializeField] private float skinWidth = 0.02f;     // зазор от стен/пола
     [SerializeField] private float groundProbeDistance = 0.15f; // глубина зонда вниз
     [SerializeField] private int maxSlides = 1;            // сколько раз "скользим" по поверхностям
-
+    
+    [Header("Push Rigidbodies")]
+    [SerializeField] private float pushPower = 1.5f;   // множитель силы толчка
+    [SerializeField] private float maxPushMass = 200f;  // толкаем слабее/не толкаем слишком тяжёлые тела
+    [SerializeField] private float minPushSpeed = 0.2f; // минимальная горизонтальная скорость для толчка
+    [SerializeField] private bool pushAlongGround = true; // толкать только по XZ (не «подбрасывать»)
+    
+    private float _yawTarget;   // куда хотим прийти
+    private float _yawCurrent;  // текущий (сглаженный)
+    private float _yawVel;  // внутренняя «скорость» SmoothDamp
+    
     public Vector3 Velocity { get; private set; } // м/с
+    
     public bool OnGround { get; private set; }
 
     /// <summary>Ожидаем нормализованное XZ (можно и не нормализовать — мы нормализуем сами).</summary>
     public Vector2 MoveInput { get; set; } // (x,z) в плоскости
+    
+    public Vector2 LookInput { get; set; } // (x,z) в плоскости
 
     // --- FixedUpdate loop ---
     private void FixedUpdate()
     {
+        if(!IsOwner) return;
+        
         float dt = Time.fixedDeltaTime;
 
         // 1) Обновляем флаг земли
         OnGround = GroundCheck();
 
-        // 2) Горизонтальная скорость задаётся входом
-        Vector3 wishDir = new Vector3(MoveInput.x, 0f, MoveInput.y);
-        if (wishDir.sqrMagnitude > 1e-6f) wishDir.Normalize();
-        Vector3 horizVel = wishDir * speed; // м/с
+        // 3) Горизонтальная скорость задаётся входом относительно поворота персонажа
+        Vector3 wishDir = (transform.forward * MoveInput.y + transform.right * MoveInput.x);
+        if (wishDir.sqrMagnitude > 1e-6f)
+            wishDir.Normalize();
 
-        // 3) Вертикаль: гравитация
+        Vector3 horizVel = wishDir * speed; // м/с
+        
+        // 4) Вертикаль: гравитация
         float vy = Velocity.y;
         if (OnGround && vy < 0f) vy = -2f; // небольшое прижатие к земле
         vy += gravity * dt;
 
         Velocity = new Vector3(horizVel.x, vy, horizVel.z);
 
-        // 4) Перемещение: sweep капсулой и остановка у препятствий
+        // 5) Перемещение: sweep капсулой и остановка у препятствий
         Vector3 delta = Velocity * dt;
         MoveWithCapsule(delta);
+    }
+
+    void Update()
+    {
+        if(!IsOwner) return;
+        
+        _yawTarget += LookInput.x * angularSpeed; 
+
+        // 2) сглаживаем к целевому углу
+        _yawCurrent = Mathf.SmoothDampAngle(
+            _yawCurrent, 
+            _yawTarget, 
+            ref _yawVel, 
+            yawSmoothTime, 
+            maxYawSpeed <= 0f ? Mathf.Infinity : maxYawSpeed, 
+            Time.deltaTime
+        );
+
+        // 3) применяем только yaw (по Y)
+        var rot = transform.rotation.eulerAngles;
+        rot.y = _yawCurrent;
+        transform.rotation = Quaternion.Euler(rot);
     }
 
     // --- Collision / sweep ---
@@ -69,6 +116,8 @@ public class SimpleCharacterMotor : MonoBehaviour
                 pos += remaining;
                 break;
             }
+            
+            TryPushRigidbody(hit, dir, Time.fixedDeltaTime);
 
             // Подходим максимально близко к препятствию
             float travel = Mathf.Max(hit.distance - skinWidth, 0f);
@@ -118,6 +167,51 @@ public class SimpleCharacterMotor : MonoBehaviour
         Vector3 center = position + Vector3.up * (radius + half);
         p1 = center + Vector3.up * half;   // верхняя сфера
         p2 = center - Vector3.up * half;   // нижняя сфера
+    }
+
+    [ServerRpc]
+    private void TryPushRigidbodyServerRpc(NetworkObjectReference targetRef, Vector3 pushDir, Vector3 hitPoint, float impulseMag)
+    {
+        if (!targetRef.TryGet(out NetworkObject target))
+            return;
+
+        Rigidbody rb = target.GetComponent<Rigidbody>();
+        if (rb == null || rb.isKinematic)
+            return;
+
+        rb.WakeUp();
+        rb.AddForceAtPosition(pushDir * impulseMag, hitPoint, ForceMode.Impulse);
+    }
+
+    private void TryPushRigidbody(RaycastHit hit, Vector3 sweepDir, float dt)
+    {
+        Rigidbody rb = hit.rigidbody;
+        if (rb == null || rb.isKinematic) return;
+
+        // Не толкаем «пол»
+        if (hit.normal.y > 0.5f) return;
+
+        Vector3 pushDir = pushAlongGround
+            ? Vector3.ProjectOnPlane(sweepDir, Vector3.up)
+            : sweepDir;
+
+        if (pushAlongGround && pushDir.y > 0f) pushDir.y = 0f;
+        if (pushDir.sqrMagnitude < 1e-6f) return;
+        pushDir.Normalize();
+
+        float horizSpeed = new Vector3(Velocity.x, 0f, Velocity.z).magnitude;
+        if (horizSpeed < minPushSpeed) return;
+
+        float massScale = (maxPushMass <= 0f) ? 1f : Mathf.Clamp01(maxPushMass / rb.mass);
+        float impulseMag = pushPower * horizSpeed * massScale;
+
+        // Только если у объекта есть NetworkObject — иначе сервер о нём не узнает
+        NetworkObject netObj = rb.GetComponent<NetworkObject>();
+        if (netObj != null && netObj.IsSpawned)
+        {
+            var netRef = new NetworkObjectReference(netObj);
+            TryPushRigidbodyServerRpc(netRef, pushDir, hit.point, impulseMag);
+        }
     }
 
 #if UNITY_EDITOR

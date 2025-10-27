@@ -4,8 +4,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerNetwork : NetworkBehaviour
 {
-    [SerializeField] private CharacterController characterController;
-    [SerializeField] private float  moveSpeed = 3f;
+    [SerializeField] private SimpleCharacterMotor characterController;
+    [SerializeField] private Camera camera;
         
     private InputAction _moveAction;
     private InputAction _lookAction;
@@ -14,8 +14,9 @@ public class PlayerNetwork : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        camera.gameObject.SetActive(IsOwner);
         if(!IsOwner) return;
-
+        
         var playerMap = InputSystem.actions.FindActionMap("Player", true);
         playerMap.Enable();
         _moveAction = playerMap.FindAction("Move", true);
@@ -35,6 +36,10 @@ public class PlayerNetwork : NetworkBehaviour
         if(!IsOwner) return;
         
         _moveVelocity = _moveAction.ReadValue<Vector2>();
-        characterController.Move(_moveVelocity * (moveSpeed * Time.deltaTime));
+        characterController.MoveInput = _moveVelocity;
+        
+        _lookVelocity = _lookAction.ReadValue<Vector2>();
+        characterController.LookInput = _lookVelocity;
     }
+    
 }
