@@ -40,12 +40,13 @@ public class RigidbodyController : NetworkBehaviour
     {
         if(!IsOwner) return;
         
-        DampVelocity();
+        DampVelocityServerRpc();
         AddRideForce();
         AddMovementForce();
     }
 
-    private void DampVelocity()
+    [ServerRpc]
+    private void DampVelocityServerRpc()
     {
         _rigidbody.linearVelocity = Vector3.Lerp(_rigidbody.linearVelocity, Vector3.zero, forceDemping * Time.fixedDeltaTime);
     }
@@ -58,7 +59,7 @@ public class RigidbodyController : NetworkBehaviour
 
         float forceTime = (Vector3.Dot(currentVelocity2D.normalized, moveDirection.normalized) + 1f) / 2f;
         
-        _rigidbody.AddForce(moveDirection.normalized * (forceAxeleration * dampingCurve.Evaluate(forceTime)), 
+        ApplyForceServerRpc(moveDirection.normalized * (forceAxeleration * dampingCurve.Evaluate(forceTime)), 
             ForceMode.Acceleration);
     }
 
@@ -91,11 +92,47 @@ public class RigidbodyController : NetworkBehaviour
 
         Debug.DrawLine(transform.position, transform.position + (rayDir * springForce), Color.yellow);
 
-        _rigidbody.AddForce(rayDir * springForce);
+        ApplyForceServerRpc(rayDir * springForce);
 
         if (hitBody != null)
         {
-            hitBody.AddForceAtPosition(rayDir * -springForce, raycastHit.point);
+            if (hitBody.TryGetComponent<NetworkObject>(out var networkObject))
+            {
+                if (networkObject.IsSpawned)
+                {
+                    var networkObjectReference = new NetworkObjectReference(networkObject);
+                    AddForceAtPositionServerRpc(networkObjectReference, rayDir * -springForce, 
+                        raycastHit.point);
+                }
+                
+            }
+            else
+            {
+                hitBody.AddForceAtPosition(rayDir * -springForce, raycastHit.point);
+            }
         }
     }
+
+    [ServerRpc]
+    private void ApplyForceServerRpc(Vector3 force, ForceMode forceMode = ForceMode.Force)
+    {
+        _rigidbody.AddForce(force, forceMode);
+    }
+    
+    [ServerRpc]
+    private void AddForceAtPositionServerRpc(NetworkObjectReference targetRef, Vector3 force, 
+        Vector3 position, ForceMode forceMode = ForceMode.Force)
+    {
+        if (!targetRef.TryGet(out NetworkObject target))
+            return;
+
+        Rigidbody rb = target.GetComponent<Rigidbody>();
+        if (rb == null || rb.isKinematic)
+            return;
+
+        rb.WakeUp();
+        rb.AddForceAtPosition(force, position, forceMode);
+    }
+    
+    
 }
