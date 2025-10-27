@@ -24,7 +24,10 @@ public class RigidbodyController : NetworkBehaviour
     [SerializeField] private float rideHeight;
     [SerializeField] private float rideSpringStrength;
     [SerializeField] private float rideSpringDamper;
-    
+
+    [Header("Ride")]
+    [SerializeField] private LayerMask dynamicRaycastLayer;
+        
     private Rigidbody _rigidbody;
     
     public Vector3 DownDirection { get; private set; } = Vector3.down;
@@ -40,18 +43,48 @@ public class RigidbodyController : NetworkBehaviour
     {
         if(!IsOwner) return;
         
+        //DampVelocity();
         DampVelocityServerRpc();
-        AddRideForce();
-        AddMovementForce();
+        AddRideForce(Time.fixedDeltaTime);
+        AddMovementForce(Time.fixedDeltaTime);
     }
 
+    /*private void OnCollisionEnter(Collision other)
+    {
+        if (((1 << other.gameObject.layer) & dynamicRaycastLayer) == 0)
+            return;
+
+        if (other.rigidbody.TryGetComponent<NetworkObject>(out var networkObject))
+        {
+            if (networkObject != null && networkObject.IsSpawned)
+            {
+                ChangeOwnershipServerRpc(new NetworkObjectReference(networkObject), OwnerClientId);   // запускает запрос на сервер
+                Debug.Log($"Ownership client ID: {networkObject.OwnerClientId}");
+            }
+        }
+    }*/
+    
+    [ServerRpc]
+    private void ChangeOwnershipServerRpc(NetworkObjectReference networkObjectReference, ulong clientId)
+    {
+        if (!networkObjectReference.TryGet(out NetworkObject target))
+            return;
+
+        target.ChangeOwnership(clientId); 
+    }
+    
+    private void DampVelocity()
+    {
+        _rigidbody.linearVelocity = Vector3.Lerp(_rigidbody.linearVelocity, Vector3.zero, forceDemping * Time.fixedDeltaTime);
+    }
+    
     [ServerRpc]
     private void DampVelocityServerRpc()
     {
         _rigidbody.linearVelocity = Vector3.Lerp(_rigidbody.linearVelocity, Vector3.zero, forceDemping * Time.fixedDeltaTime);
     }
 
-    private void AddMovementForce()
+    private void AddMovementForce(float delta)
     {
         Vector3 moveDirection = new Vector3(MoveInput.x, 0, MoveInput.y);
         Vector2 currentVelocity2D = new Vector2(_rigidbody.linearVelocity.x, _rigidbody.linearVelocity.z);
@@ -59,11 +92,14 @@ public class RigidbodyController : NetworkBehaviour
 
         float forceTime = (Vector3.Dot(currentVelocity2D.normalized, moveDirection.normalized) + 1f) / 2f;
         
-        ApplyForceServerRpc(moveDirection.normalized * (forceAxeleration * dampingCurve.Evaluate(forceTime)), 
+        ApplyForceServerRpc(moveDirection.normalized * (forceAxeleration * dampingCurve.Evaluate(forceTime) * delta), 
             ForceMode.Acceleration);
+        
+        /*_rigidbody.AddForce(moveDirection.normalized * (forceAxeleration * dampingCurve.Evaluate(forceTime)), 
+            ForceMode.Acceleration);*/
     }
 
-    private void AddRideForce()
+    private void AddRideForce(float delta)
     {
         if (!Physics.Raycast(transform.position - (DownDirection * rideRaycastOffset), 
                 DownDirection, out var raycastHit, rideRaycastDistance, rideRaycastLayer))
@@ -88,10 +124,11 @@ public class RigidbodyController : NetworkBehaviour
 
         float x = raycastHit.distance - rideHeight;
 
-        float springForce = (x * rideSpringStrength) - (relVel * rideSpringDamper);
+        float springForce = (x * rideSpringStrength) - (relVel * rideSpringDamper) * delta;
 
         Debug.DrawLine(transform.position, transform.position + (rayDir * springForce), Color.yellow);
 
+        //_rigidbody.AddForce(rayDir * springForce);
         ApplyForceServerRpc(rayDir * springForce);
 
         if (hitBody != null)
