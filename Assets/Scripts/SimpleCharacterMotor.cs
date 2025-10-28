@@ -1,5 +1,4 @@
-﻿using System;
-using Unity.Netcode;
+﻿using FishNet.Object;
 using UnityEngine;
 
 [DefaultExecutionOrder(-50)]
@@ -170,12 +169,12 @@ public class SimpleCharacterMotor : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void TryPushRigidbodyServerRpc(NetworkObjectReference targetRef, Vector3 pushDir, Vector3 hitPoint, float impulseMag)
+    private void TryPushRigidbodyServerRpc(NetworkObject targetRef, Vector3 pushDir, Vector3 hitPoint, float impulseMag)
     {
-        if (!targetRef.TryGet(out NetworkObject target))
+        if (targetRef == null)
             return;
 
-        Rigidbody rb = target.GetComponent<Rigidbody>();
+        Rigidbody rb = targetRef.GetComponent<Rigidbody>();
         if (rb == null || rb.isKinematic)
             return;
 
@@ -209,8 +208,7 @@ public class SimpleCharacterMotor : NetworkBehaviour
         NetworkObject netObj = rb.GetComponent<NetworkObject>();
         if (netObj != null && netObj.IsSpawned)
         {
-            var netRef = new NetworkObjectReference(netObj);
-            TryPushRigidbodyServerRpc(netRef, pushDir, hit.point, impulseMag);
+            TryPushRigidbodyServerRpc(netObj, pushDir, hit.point, impulseMag);
         }
     }
 

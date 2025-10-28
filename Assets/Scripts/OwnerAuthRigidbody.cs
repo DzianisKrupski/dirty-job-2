@@ -1,11 +1,10 @@
-﻿using Unity.Netcode;
-using Unity.Netcode.Components;
+﻿
+using FishNet.Object;
 using UnityEngine;
 
-[RequireComponent(typeof(NetworkObject), typeof(Rigidbody), typeof(NetworkTransform))]
 public class OwnerAuthRigidbody : NetworkBehaviour
 {
-    private Rigidbody rb;
+    /*private Rigidbody rb;
 
     private void Awake() => rb = GetComponent<Rigidbody>();
 
@@ -40,5 +39,5 @@ public class OwnerAuthRigidbody : NetworkBehaviour
             rb.interpolation = RigidbodyInterpolation.None; // сглаживание делает NetworkTransform
             rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
         }
-    }
+    }*/
 }

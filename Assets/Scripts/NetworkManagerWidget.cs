@@ -1,13 +1,9 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class NetworkManagerWidget : MonoBehaviour
 {
-    [SerializeField] private Button serverButton;
+    /*[SerializeField] private Button serverButton;
     [SerializeField] private Button hostButton;
     [SerializeField] private Button clientButton;
 
@@ -27,5 +23,5 @@ public class NetworkManagerWidget : MonoBehaviour
         {
             NetworkManager.Singleton.StartClient();
         });
-    }
+    }*/
 }

@@ -1,4 +1,5 @@
-﻿using Unity.Netcode;
+﻿
+using FishNet.Object;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,10 +13,10 @@ public class RigidbodyPlayerNetwork : NetworkBehaviour
     private Vector3 _moveVelocity;
     private Vector3 _lookVelocity;
 
-    public override void OnNetworkSpawn()
+    public override void OnStartNetwork()
     {
-        camera.gameObject.SetActive(IsOwner);
-        if(!IsOwner) return;
+        camera.gameObject.SetActive(Owner.IsLocalClient);
+        if(!Owner.IsLocalClient) return;
         
         var playerMap = InputSystem.actions.FindActionMap("Player", true);
         playerMap.Enable();
@@ -23,7 +24,7 @@ public class RigidbodyPlayerNetwork : NetworkBehaviour
         _lookAction = playerMap.FindAction("Look", true);
     }
 
-    public override void OnNetworkDespawn()
+    public override void OnStopNetwork()
     {
         if(!IsOwner) return;
         

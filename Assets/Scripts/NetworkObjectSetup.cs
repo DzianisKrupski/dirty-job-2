@@ -1,14 +1,13 @@
-﻿using Unity.Netcode;
-using UnityEngine;
+﻿using FishNet.Object;
 
 public class NetworkObjectSetup : NetworkBehaviour
 {
-    public override void OnNetworkSpawn()
+    /*public override void OnStartNetwork()
     {
-        if(!IsServer) return;
+        if(!IsServerInitialized) return;
         
         var no = GetComponent<NetworkObject>();
         // на всякий случай снимем лок
         no.SetOwnershipLock(false);
-    }
+    }*/
 }

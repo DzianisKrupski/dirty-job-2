@@ -1,5 +1,5 @@
-﻿using System;
-using Unity.Netcode;
+﻿
+using FishNet.Object;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -34,7 +34,7 @@ public class RigidbodyController : NetworkBehaviour
     public Vector2 MoveInput { get; set; } // (x,z) в плоскости
     public Vector2 LookInput { get; set; } // (x,z) в плоскости
 
-    public override void OnNetworkSpawn()
+    public override void OnStartNetwork()
     {
         _rigidbody = GetComponent<Rigidbody>();
     }
@@ -49,7 +49,7 @@ public class RigidbodyController : NetworkBehaviour
         AddMovementForce(Time.fixedDeltaTime);
     }
 
-    private void OnCollisionEnter(Collision other)
+    /*private void OnCollisionEnter(Collision other)
     {
         if (((1 << other.gameObject.layer) & dynamicRaycastLayer) == 0)
             return;
@@ -71,7 +71,7 @@ public class RigidbodyController : NetworkBehaviour
             return;
 
         target.ChangeOwnership(clientId); 
-    }
+    }*/
     
     private void DampVelocity()
     {
@@ -152,7 +152,7 @@ public class RigidbodyController : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
+    /*[ServerRpc]
     private void ApplyForceServerRpc(Vector3 force, ForceMode forceMode = ForceMode.Force)
     {
         _rigidbody.AddForce(force, forceMode);
@@ -171,7 +171,5 @@ public class RigidbodyController : NetworkBehaviour
 
         rb.WakeUp();
         rb.AddForceAtPosition(force, position, forceMode);
-    }
-    
-    
+    }*/
 }
