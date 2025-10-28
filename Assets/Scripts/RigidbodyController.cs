@@ -1,10 +1,15 @@
 ﻿
+using System;
+using System.Collections.Generic;
+using FishNet.Connection;
 using FishNet.Object;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class RigidbodyController : NetworkBehaviour
 {
+
+    private const double OwnedTime = 0.2f;
     
     [Header("Movement")]
     [SerializeField] private float maxVelocityMagnitude = 10f;  
@@ -30,6 +35,14 @@ public class RigidbodyController : NetworkBehaviour
         
     private Rigidbody _rigidbody;
     
+    private struct CollisionTimestamp
+    {
+        public double Timestamp;
+        public bool IsOnCollision;
+    }
+
+    private Dictionary<NetworkObject, CollisionTimestamp> _ownedMap = new Dictionary<NetworkObject, CollisionTimestamp>();
+    
     public Vector3 DownDirection { get; private set; } = Vector3.down;
     public Vector2 MoveInput { get; set; } // (x,z) в плоскости
     public Vector2 LookInput { get; set; } // (x,z) в плоскости
@@ -43,13 +56,27 @@ public class RigidbodyController : NetworkBehaviour
     {
         if(!IsOwner) return;
         
+        ProcessOwnershipMap();
         DampVelocity();
         //DampVelocityServerRpc();
         AddRideForce(Time.fixedDeltaTime);
         AddMovementForce(Time.fixedDeltaTime);
     }
+    
+    [ServerRpc] 
+    private void GiveOwnership(NetworkObject box, NetworkConnection toWho)
+    {
+        box.GiveOwnership(toWho); // короткая аренда: 0.2–0.5 c после последнего толчка
+    }
+    
+    [ServerRpc]
+    private void ReturnToServerAuth(NetworkObject no)
+    {
+        if (no != null)
+            no.RemoveOwnership(); // сервер снова единственный авторитет
+    }
 
-    /*private void OnCollisionEnter(Collision other)
+    private void OnCollisionEnter(Collision other)
     {
         if (((1 << other.gameObject.layer) & dynamicRaycastLayer) == 0)
             return;
@@ -58,19 +85,74 @@ public class RigidbodyController : NetworkBehaviour
         {
             if (networkObject != null && networkObject.IsSpawned)
             {
-                ChangeOwnershipServerRpc(new NetworkObjectReference(networkObject), OwnerClientId);   // запускает запрос на сервер
-                Debug.Log($"Ownership client ID: {networkObject.OwnerClientId}");
+                if (!_ownedMap.ContainsKey(networkObject) && networkObject.Owner.ClientId == -1)
+                {
+                    Debug.Log($"Give ownership {networkObject}");
+                    GiveOwnership(networkObject, Owner);
+                    _ownedMap.Add(networkObject, new CollisionTimestamp
+                    {
+                        Timestamp = Time.timeAsDouble,
+                        IsOnCollision = true
+                    });
+                }else if (_ownedMap.ContainsKey(networkObject))
+                {
+                    var timestamp = _ownedMap[networkObject];
+                    timestamp.Timestamp = Time.timeAsDouble;
+                    timestamp.IsOnCollision = true;
+                    _ownedMap[networkObject] = timestamp;
+                }
             }
         }
     }
-    
-    [ServerRpc]
+
+    private void OnCollisionExit(Collision other)
+    {
+        if (((1 << other.gameObject.layer) & dynamicRaycastLayer) == 0)
+            return;
+
+        if (other.rigidbody.TryGetComponent<NetworkObject>(out var networkObject))
+        {
+            if (networkObject != null && networkObject.IsSpawned)
+            {
+                if (_ownedMap.ContainsKey(networkObject))
+                {
+                    var timestamp = _ownedMap[networkObject];
+                    timestamp.Timestamp = Time.timeAsDouble;
+                    timestamp.IsOnCollision = false;
+                    _ownedMap[networkObject] = timestamp;
+                }
+            }
+        }
+    }
+
+    private void ProcessOwnershipMap()
+    {
+        var time = Time.timeAsDouble;
+        List<NetworkObject> removeList = new List<NetworkObject>(_ownedMap.Count);
+        
+        foreach (var kvp in _ownedMap)
+        {
+            if (!kvp.Value.IsOnCollision && time - kvp.Value.Timestamp > OwnedTime)
+            {
+                removeList.Add(kvp.Key);
+                Debug.Log($"Return ownership {kvp.Key} : {time - kvp.Value.Timestamp}");
+                ReturnToServerAuth(kvp.Key);
+            }
+        }
+
+        foreach (var remove in removeList)
+        {
+            _ownedMap.Remove(remove);
+        }
+    }
+
+    /*[ServerRpc]
     private void ChangeOwnershipServerRpc(NetworkObjectReference networkObjectReference, ulong clientId)
     {
         if (!networkObjectReference.TryGet(out NetworkObject target))
             return;
 
-        target.ChangeOwnership(clientId); 
+        target.ChangeOwnership(clientId);
     }*/
     
     private void DampVelocity()
@@ -78,11 +160,11 @@ public class RigidbodyController : NetworkBehaviour
         _rigidbody.linearVelocity = Vector3.Lerp(_rigidbody.linearVelocity, Vector3.zero, forceDemping * Time.fixedDeltaTime);
     }
     
-    [ServerRpc]
+    /*[ServerRpc]
     private void DampVelocityServerRpc()
     {
         _rigidbody.linearVelocity = Vector3.Lerp(_rigidbody.linearVelocity, Vector3.zero, forceDemping * Time.fixedDeltaTime);
-    }
+    }*/
 
     private void AddMovementForce(float delta)
     {

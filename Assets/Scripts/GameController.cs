@@ -13,6 +13,8 @@ public class GameController : MonoBehaviour
         uiMap.Enable();
         _backAction = uiMap.FindAction("Cursor", true);
         _backAction.performed += OnCursorPerformed;
+
+        Application.targetFrameRate = 60;
     }
 
     private void OnDisable()
