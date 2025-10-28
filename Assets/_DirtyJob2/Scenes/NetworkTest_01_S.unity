@@ -183,6 +183,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube_01_PF (14)
       objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 985878903
@@ -260,6 +268,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube_01_PF (11)
       objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3907395380
@@ -336,6 +352,14 @@ PrefabInstance:
     - target: {fileID: 1129337112411536125, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: m_Name
       value: Cube_01_PF (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -1014,6 +1038,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube_01_PF (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2372458054
@@ -1210,6 +1242,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube_01_PF (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2748223855
@@ -1336,6 +1376,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube_01_PF (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3156263022
@@ -1400,6 +1448,14 @@ PrefabInstance:
     - target: {fileID: 1129337112411536125, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: m_Name
       value: Cube_01_PF (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -1485,6 +1541,14 @@ PrefabInstance:
     - target: {fileID: 1129337112411536125, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: m_Name
       value: Cube_01_PF (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -2027,6 +2091,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube_01_PF (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3322569950
@@ -2279,6 +2351,14 @@ PrefabInstance:
     - target: {fileID: 1129337112411536125, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: m_Name
       value: Cube_01_PF (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -2614,7 +2694,7 @@ MonoBehaviour:
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: f5d7a836d835a2a4fb768dbccaecbb90, type: 2}
-    TickRate: 30
+    TickRate: 60
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
     ConnectionData: 
@@ -2725,6 +2805,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cube_01_PF (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 381473534
@@ -2789,6 +2877,14 @@ PrefabInstance:
     - target: {fileID: 1129337112411536125, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: m_Name
       value: Cube_01_PF (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -2874,6 +2970,14 @@ PrefabInstance:
     - target: {fileID: 1129337112411536125, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: m_Name
       value: Cube_01_PF (12)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -2999,6 +3103,14 @@ PrefabInstance:
     - target: {fileID: 1129337112411536125, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: m_Name
       value: Cube_01_PF (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 2817944753937609741, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: AuthorityMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
+      propertyPath: Ownership
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3461953528765946543, guid: 7343c12baf5eb5c4f9b7a71d0b802e8c, type: 3}
       propertyPath: GlobalObjectIdHash

@@ -43,13 +43,13 @@ public class RigidbodyController : NetworkBehaviour
     {
         if(!IsOwner) return;
         
-        //DampVelocity();
-        DampVelocityServerRpc();
+        DampVelocity();
+        //DampVelocityServerRpc();
         AddRideForce(Time.fixedDeltaTime);
         AddMovementForce(Time.fixedDeltaTime);
     }
 
-    /*private void OnCollisionEnter(Collision other)
+    private void OnCollisionEnter(Collision other)
     {
         if (((1 << other.gameObject.layer) & dynamicRaycastLayer) == 0)
             return;
@@ -62,7 +62,7 @@ public class RigidbodyController : NetworkBehaviour
                 Debug.Log($"Ownership client ID: {networkObject.OwnerClientId}");
             }
         }
-    }*/
+    }
     
     [ServerRpc]
     private void ChangeOwnershipServerRpc(NetworkObjectReference networkObjectReference, ulong clientId)
@@ -92,11 +92,11 @@ public class RigidbodyController : NetworkBehaviour
 
         float forceTime = (Vector3.Dot(currentVelocity2D.normalized, moveDirection.normalized) + 1f) / 2f;
         
-        ApplyForceServerRpc(moveDirection.normalized * (forceAxeleration * dampingCurve.Evaluate(forceTime) * delta), 
-            ForceMode.Acceleration);
-        
-        /*_rigidbody.AddForce(moveDirection.normalized * (forceAxeleration * dampingCurve.Evaluate(forceTime)), 
+        /*ApplyForceServerRpc(moveDirection.normalized * (forceAxeleration * dampingCurve.Evaluate(forceTime) * delta), 
             ForceMode.Acceleration);*/
+        
+        _rigidbody.AddForce(moveDirection.normalized * (forceAxeleration * dampingCurve.Evaluate(forceTime) * delta), 
+            ForceMode.Acceleration);
     }
 
     private void AddRideForce(float delta)
@@ -128,12 +128,12 @@ public class RigidbodyController : NetworkBehaviour
 
         Debug.DrawLine(transform.position, transform.position + (rayDir * springForce), Color.yellow);
 
-        //_rigidbody.AddForce(rayDir * springForce);
-        ApplyForceServerRpc(rayDir * springForce);
+        _rigidbody.AddForce(rayDir * springForce);
+        //ApplyForceServerRpc(rayDir * springForce);
 
         if (hitBody != null)
         {
-            if (hitBody.TryGetComponent<NetworkObject>(out var networkObject))
+            /*if (hitBody.TryGetComponent<NetworkObject>(out var networkObject))
             {
                 if (networkObject.IsSpawned)
                 {
@@ -146,7 +146,9 @@ public class RigidbodyController : NetworkBehaviour
             else
             {
                 hitBody.AddForceAtPosition(rayDir * -springForce, raycastHit.point);
-            }
+            }*/
+            
+            hitBody.AddForceAtPosition(rayDir * -springForce, raycastHit.point);
         }
     }
 
