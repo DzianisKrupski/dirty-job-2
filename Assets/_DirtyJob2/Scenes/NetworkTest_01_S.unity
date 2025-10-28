@@ -2652,6 +2652,7 @@ GameObject:
   - component: {fileID: 1846689717}
   - component: {fileID: 1846689718}
   - component: {fileID: 1846689719}
+  - component: {fileID: 1846689720}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -2694,7 +2695,7 @@ MonoBehaviour:
     Prefabs:
       NetworkPrefabsLists:
       - {fileID: 11400000, guid: f5d7a836d835a2a4fb768dbccaecbb90, type: 2}
-    TickRate: 60
+    TickRate: 30
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 0
     ConnectionData: 
@@ -2712,6 +2713,7 @@ MonoBehaviour:
     NetworkTopology: 0
     UseCMBService: 0
     AutoSpawnPlayerPrefabClientSide: 1
+    NetworkMessageMetrics: 1
     NetworkProfilingMetrics: 1
     OldPrefabList: []
   RunInBackground: 1
@@ -2729,7 +2731,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Transports.UTP.UnityTransport
   m_ProtocolType: 0
-  m_UseWebSockets: 0
+  m_UseWebSockets: 1
   m_UseEncryption: 0
   m_MaxPacketQueueSize: 128
   m_MaxPayloadSize: 6144
@@ -2745,6 +2747,58 @@ MonoBehaviour:
     PacketDelayMS: 0
     PacketJitterMS: 0
     PacketDropRate: 0
+--- !u!114 &1846689720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1846689716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98d9db9626104da59357651088226725, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Multiplayer.Tools.NetworkSimulator.Runtime::Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulator
+  m_PresetAsset: {fileID: 0}
+  m_PresetReference:
+    rid: 5642931802763690083
+  m_Scenario:
+    rid: 5642931800497455354
+  m_IsScenarioSettingsFolded: 1
+  AutoRunScenario: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 5642931800497455353
+      type: {class: NetworkSimulatorPreset, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime, asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
+      data:
+        <Name>k__BackingField: Home Broadband with Congested Network
+        <Description>k__BackingField: Desktop and console platforms trough congested
+          networks (multiple downloads or streaming already using the network's maximum
+          capacity). Medium ping, bad jitter and little packet loss.
+        <PacketDelayMs>k__BackingField: 50
+        <PacketJitterMs>k__BackingField: 50
+        <PacketLossInterval>k__BackingField: 0
+        <PacketLossPercent>k__BackingField: 1
+    - rid: 5642931800497455354
+      type: {class: ConnectionsCycle, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime.BuiltInScenarios, asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
+      data:
+        m_Configurations:
+        - m_ClassPreset:
+            rid: 5642931800497455353
+          m_ScriptableObjectPreset: {fileID: 0}
+          ChangeIntervalMilliseconds: 5000
+    - rid: 5642931802763690083
+      type: {class: NetworkSimulatorPreset, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime, asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
+      data:
+        <Name>k__BackingField: Home Broadband with Congested Network
+        <Description>k__BackingField: Desktop and console platforms trough congested
+          networks (multiple downloads or streaming already using the network's maximum
+          capacity). Medium ping, bad jitter and little packet loss.
+        <PacketDelayMs>k__BackingField: 50
+        <PacketJitterMs>k__BackingField: 50
+        <PacketLossInterval>k__BackingField: 0
+        <PacketLossPercent>k__BackingField: 1
 --- !u!1001 &1866111351
 PrefabInstance:
   m_ObjectHideFlags: 0
