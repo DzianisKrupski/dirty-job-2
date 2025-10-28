@@ -9,7 +9,7 @@ using UnityEngine;
 public class RigidbodyController : NetworkBehaviour
 {
 
-    private const double OwnedTime = 0.2f;
+    private const double OwnedTime = 1f;
     
     [Header("Movement")]
     [SerializeField] private float maxVelocityMagnitude = 10f;  
