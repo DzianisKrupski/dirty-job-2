@@ -4,8 +4,10 @@ using Unity.Services.Core;
 using Unity.Services.Authentication;
 using Unity.Services.Relay;
 using FishNet.Managing;
-using FishNet.Transporting.UTP;         // UnityTransport для FishNet (Fishy UTP)
+using FishNet.Transporting.UTP;
+using Unity.Networking.Transport.Relay;
 using TMPro;
+using Unity.Services.Relay.Models;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,6 +33,24 @@ public class RelayBootstrap : MonoBehaviour
         joinServerButton.onClick.AddListener(OnClickJoinToggle);
 
         UpdateUi();
+        InitializeUnityServicesAsync();
+
+        // 2) (опционально) базовые стейты соединений от FishyUnityTransport
+        var utp = fishNet.TransportManager.GetTransport<UnityTransport>();
+        utp.OnServerConnectionState += args =>
+            Debug.Log($"[UTP] Server state: {args.ConnectionState}");
+        utp.OnClientConnectionState += args =>
+            Debug.Log($"[UTP] Client state: {args.ConnectionState}");
+        utp.OnRemoteConnectionState += args =>
+            Debug.Log($"[UTP] Remote {args.ConnectionId} : {args.ConnectionState}");
+    }
+
+    private async void InitializeUnityServicesAsync()
+    {
+        await UnityServices.InitializeAsync();if (!AuthenticationService.Instance.IsSignedIn)
+        {
+            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        }
     }
 
     private async Task EnsureServicesAsync()
@@ -146,17 +166,21 @@ public class RelayBootstrap : MonoBehaviour
         var joinCode = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId);
 
         var utp = fishNet.TransportManager.GetTransport<UnityTransport>();
-        utp.SetRelayServerData(
-            alloc.RelayServer.IpV4,
-            (ushort)alloc.RelayServer.Port,
-            alloc.AllocationIdBytes,
-            alloc.Key,
-            alloc.ConnectionData,
-            alloc.ConnectionData,   // у хоста hostConnectionData = свои же connectionData
-            true                    // DTLS
-        );
+        
+        utp.ConnectionData.Address = string.Empty;
+        utp.ConnectionData.Port = 0;
 
-        // Host = сервер + локальный клиент
+        // ==========================================================
+        // ИСПРАВЛЕНИЕ ЗДЕСЬ
+        // Определяем тип соединения. Так как вы выключили шифрование:
+        string connectionType = "udp"; 
+        // (Если бы шифрование было включено, вы бы использовали "dtls")
+
+        // Используем AllocationUtils, как требует новый пакет
+        utp.SetRelayServerData(AllocationUtils.ToRelayServerData(alloc, connectionType));
+        // ==========================================================
+
+        // Только теперь стартуем
         fishNet.ServerManager.StartConnection();
         fishNet.ClientManager.StartConnection();
 
@@ -168,27 +192,26 @@ public class RelayBootstrap : MonoBehaviour
         await EnsureServicesAsync();
 
         var join = await RelayService.Instance.JoinAllocationAsync(joinCode);
-
+        
         var utp = fishNet.TransportManager.GetTransport<UnityTransport>();
-        utp.SetRelayServerData(
-            join.RelayServer.IpV4,
-            (ushort)join.RelayServer.Port,
-            join.AllocationIdBytes,
-            join.Key,
-            join.ConnectionData,
-            join.HostConnectionData, // ВАЖНО у клиента — данные хоста
-            true
-        );
+        
+        utp.ConnectionData.Address = string.Empty;
+        utp.ConnectionData.Port = 0;
+        
+        // ==========================================================
+        // ИСПРАВЛЕНИЕ ЗДЕСЬ
+        // Тип должен совпадать с хостом
+        string connectionType = "udp"; 
+
+        // Используем AllocationUtils для клиента
+        utp.SetRelayServerData(AllocationUtils.ToRelayServerData(join, connectionType));
+        // ==========================================================
 
         return fishNet.ClientManager.StartConnection();
     }
 
     private void StopHost()
     {
-        // порядок не критичен, но обычно сначала клиент, потом сервер
-        if (fishNet.ClientManager.Connection.ClientId != -1) // подключён?
-            fishNet.ClientManager.StopConnection();
-
         if (fishNet.ServerManager.Started)
             fishNet.ServerManager.StopConnection(true);
 
