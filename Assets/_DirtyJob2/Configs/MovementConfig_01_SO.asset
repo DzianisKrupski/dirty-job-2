@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f714fd192834124be8566d1917078ed, type: 3}
+  m_Name: MovementConfig_01_SO
+  m_EditorClassIdentifier: Assembly-CSharp::Player.MovementConfig
+  moveSpeed: 6
+  accel: 30
+  maxGroundSpeed: 7
+  airAccel: 8
+  maxAirSpeed: 5
+  jumpHeight: 1.2
+  coyoteTime: 0.12
+  jumpBuffer: 0.12
+  slideMinSpeed: 8
+  slideFriction: 1.5
+  crawlSpeed: 2.5
+  standHeight: 1.8
+  crawlHeight: 1
+  heightLerpSpeed: 12
+  rideHeight: 0.9
+  springK: 1200
+  damperC: 140
+  groundCheckRadius: 0.25
+  maxSlopeAngle: 50
