@@ -147,11 +147,11 @@ GameObject:
   m_Component:
   - component: {fileID: 2032305509822942757}
   - component: {fileID: 2022195381393216736}
-  - component: {fileID: 284277290163139341}
   - component: {fileID: 8022025200510761908}
   - component: {fileID: 6590104932688112637}
   - component: {fileID: 5324645779085054668}
   - component: {fileID: 333368095920827566}
+  - component: {fileID: 4114852449715820850}
   m_Layer: 8
   m_Name: Player_01_PF
   m_TagString: Untagged
@@ -187,22 +187,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c71b0b57d4846d297ebdb9bd8dc90a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerController
-  input: {fileID: 284277290163139341}
+  playerInput: {fileID: 4114852449715820850}
   movement: {fileID: 8022025200510761908}
   interactor: {fileID: 6590104932688112637}
---- !u!114 &284277290163139341
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7066533899135885916}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43ae16e7139d4582bf494c06d38f0795, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerInputController
-  analogMove: 1
 --- !u!114 &8022025200510761908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,3 +280,33 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4114852449715820850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7066533899135885916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Keyboard&Mouse
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}

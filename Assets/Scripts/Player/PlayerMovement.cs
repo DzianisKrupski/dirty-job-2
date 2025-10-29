@@ -33,16 +33,16 @@ namespace Player
         private bool _isGrounded;
         private readonly RaycastHit[] _hitBuf = new RaycastHit[2];
 
-        void OnEnable()
+        private void OnEnable()
         {
             if (config != null) config.OnChanged += ApplyImmediateConfigChanges;
         }
-        void OnDisable()
+        private void OnDisable()
         {
             if (config != null) config.OnChanged -= ApplyImmediateConfigChanges;
         }
 
-        void Awake()
+        private void Awake()
         {
             rb.freezeRotation = true;
             rb.interpolation = RigidbodyInterpolation.Interpolate;

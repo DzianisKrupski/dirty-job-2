@@ -17,7 +17,7 @@ MonoBehaviour:
   maxGroundSpeed: 7
   airAccel: 8
   maxAirSpeed: 5
-  jumpHeight: 1.2
+  jumpHeight: 5
   coyoteTime: 0.12
   jumpBuffer: 0.12
   slideMinSpeed: 8
@@ -28,6 +28,7 @@ MonoBehaviour:
   heightLerpSpeed: 12
   rideHeight: 0.9
   springK: 1200
-  damperC: 140
+  hoverTolerance: 1
+  maxSpringAcceleration: 60
   groundCheckRadius: 0.25
   maxSlopeAngle: 50

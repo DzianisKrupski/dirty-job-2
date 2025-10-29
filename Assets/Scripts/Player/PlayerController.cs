@@ -1,37 +1,44 @@
 ﻿#nullable enable
 using UnityEngine;
 using System;
+using UnityEngine.InputSystem;
 
 namespace Player
 {
     [DisallowMultipleComponent]
     public sealed class PlayerController : MonoBehaviour
     {
-        [SerializeField] private PlayerInputController input = default!;
+        [SerializeField] private PlayerInputController playerInput = default!;
         [SerializeField] private PlayerMovement movement = default!;
         [SerializeField] private PlayerInteractor interactor = default!;
 
+        private InputAction? _move;
+        private InputAction? _jump;
+        private InputAction? _crouch;
+        private InputAction? _interact;
+        
         public event Action<MotorState>? OnStateChanged;
 
-        void Awake()
+        private void Awake()
         {
             if (movement != null)
                 movement.OnStateChanged += s => OnStateChanged?.Invoke(s);
+            
+            
         }
 
-        void Update()
+        private void FixedUpdate()
         {
-            // Роутинг ввода в движение
-            if (input == null || movement == null) return;
-            movement.SetMoveInput(input.Move);
-            movement.SetJump(input.JumpPressed);
-            movement.SetCrouch(input.CrouchHeld);
+            PlayerInputData inputData = playerInput.GetInputs();
+            
+            movement.SetMoveInput(inputData.move);
+            movement.SetCrouch(inputData.crouch);
+            
+            movement.SetJump(inputData.jump);
 
-            // Роутинг ввода во взаимодействие
             if (interactor != null)
             {
-                if (input.InteractPressed) interactor.TryInteract();
-                if (input.ThrowPressed) interactor.TryThrow();
+                interactor.TryInteract();
             }
         }
     }

@@ -1,32 +1,68 @@
 ﻿#nullable enable
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Player
 {
-    [DisallowMultipleComponent]
-    public sealed class PlayerInputController : MonoBehaviour
+    [Serializable]
+    public struct PlayerInputData
     {
-        [SerializeField] private bool analogMove = true;
+        public Vector2 move;
+        public bool jump;
+        public bool crouch;
+        public bool interact;
+    }
+    
+    public class PlayerInputController : MonoBehaviour
+    {
+        [SerializeField] private PlayerInput playerInput = default!;
+        
+        private InputAction? _move;
+        private InputAction? _jump;
+        private InputAction? _crouch;
+        private InputAction? _interact;
+        private PlayerInputData _input;
 
-        private Vector2 _move;
-        private bool _jump;
-        private bool _crouch;
-        private bool _interact;
-        private bool _throw;
+        private bool _jumpTrigger;
+        private bool _interactTrigger;
+        
+        public PlayerInputData GetInputs() => _input;
 
-        public Vector2 Move => analogMove ? Vector2.ClampMagnitude(_move, 1f) : _move.normalized;
-        public bool JumpPressed => _jump;
-        public bool CrouchHeld => _crouch;
-        public bool InteractPressed => Consume(ref _interact);
-        public bool ThrowPressed => Consume(ref _throw);
+        private void OnEnable()
+        {
+            if (playerInput != null)
+            {
+                var actions = playerInput.actions;
+                
+                _move = actions.FindAction("Move",true);
+                _jump = actions.FindAction("Jump",true);
+                _crouch = actions.FindAction("Crouch",true);
+                _interact = actions.FindAction("Interact",true);
+            }
 
-        public void OnMove(InputValue v) => _move = v.Get<Vector2>();
-        public void OnJump(InputValue v) => _jump = v.isPressed;
-        public void OnCrouch(InputValue v) => _crouch = v.isPressed;
-        public void OnInteract(InputValue v) => _interact = v.isPressed;
-        public void OnThrow(InputValue v) => _throw = v.isPressed;
+            if (_jump != null) _jump.started += OnJumpStarted;
+            if (_interact != null) _interact.started += OnInteractStarted;
+        }
 
-        private static bool Consume(ref bool b) { bool v = b; b = false; return v; }
+        private void OnDisable()
+        {
+            if (_jump != null) _jump.started -= OnJumpStarted;
+            if (_interact != null) _interact.started -= OnInteractStarted;
+        }
+        
+        private void OnJumpStarted(InputAction.CallbackContext ctx) => _jumpTrigger = true;
+        private void OnInteractStarted(InputAction.CallbackContext ctx) => _interactTrigger = true;
+
+        private void Update()
+        {
+            _input = new PlayerInputData
+            {
+                move = _move?.ReadValue<Vector2>() ?? Vector2.zero,
+                jump = _jumpTrigger,
+                crouch = _crouch != null && _crouch.ReadValue<bool>(),
+                interact = _interactTrigger
+            };
+        }
     }
 }
