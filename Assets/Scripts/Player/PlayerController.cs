@@ -1,11 +1,12 @@
 ﻿#nullable enable
 using UnityEngine;
 using System;
+using FishNet.Object;
 
 namespace Player
 {
     [DisallowMultipleComponent]
-    public sealed class PlayerController : MonoBehaviour
+    public sealed class PlayerController : NetworkBehaviour
     {
         [SerializeField] private PlayerInputController playerInput = default!;
         [SerializeField] private PlayerMovement movement = default!;
@@ -16,8 +17,17 @@ namespace Player
         
         public event Action<MotorState>? OnStateChanged;
 
-        private void Awake()
+        public override void OnStartNetwork()
         {
+            if (!Owner.IsLocalClient)
+            {
+                cameraController.gameObject.SetActive(false);
+                movement.enabled = false;
+                interactor.enabled = false;
+                playerInput.enabled = false;
+                enabled = false;
+            }
+            
             if (movement != null)
             {
                 movement.Initialize(0f, 0f, _lookPhysicsState);

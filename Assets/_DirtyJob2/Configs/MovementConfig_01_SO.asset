@@ -47,4 +47,4 @@ MonoBehaviour:
   holdDistance: 1.8
   holdSpring: 90
   holdDamper: 12
-  throwImpulse: 4
+  throwImpulse: 12

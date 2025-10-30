@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using UnityEngine;
 using System;
+using FishNet.Object;
 
 namespace Player
 {
@@ -13,7 +14,7 @@ namespace Player
     }
 
     [DisallowMultipleComponent]
-    public sealed class PlayerMovement : MonoBehaviour
+    public sealed class PlayerMovement : NetworkBehaviour
     {
         [SerializeField] private MovementConfig config = default!;
         [SerializeField] private Rigidbody rb = default!;
