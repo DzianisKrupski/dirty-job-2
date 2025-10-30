@@ -40,6 +40,7 @@ namespace Player
         [SerializeField] private float maxSpringAcceleration = 60f;
         [SerializeField] private float groundCheckRadius = 0.25f;
         [SerializeField] private float maxSlopeAngle = 50f;
+        [SerializeField] private float springDisableAfterJump = 0.12f;
 
         public float MoveSpeed => moveSpeed;
         public float Accel => accel;
@@ -61,6 +62,7 @@ namespace Player
         public float MaxSpringAcceleration => maxSpringAcceleration;
         public float GroundCheckRadius => groundCheckRadius;
         public float MaxSlopeAngle => maxSlopeAngle;
+        public float SpringDisableAfterJump => springDisableAfterJump;
 
 #if UNITY_EDITOR
         void OnValidate() => OnChanged?.Invoke(); // моментально дергаем подписчиков в Editor

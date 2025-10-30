@@ -26,6 +26,7 @@ namespace Player
         private Vector2 _moveInput;
         private bool _jumpPressed;
         private bool _crouchHeld;
+        private float _springLockUntil;
 
         private float _lastGrounded;
         private float _lastJumpPressed;
@@ -48,16 +49,6 @@ namespace Player
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             SetHeight(config.StandHeight, true);
             SwitchState(MotorState.Air);
-        }
-
-        /// <summary>Горячо подменить конфиг в рантайме (меню, сетевой профиль и т.п.).</summary>
-        public void SetConfig(MovementConfig newConfig)
-        {
-            if (config == newConfig || newConfig == null) return;
-            if (config != null) config.OnChanged -= ApplyImmediateConfigChanges;
-            config = newConfig;
-            config.OnChanged += ApplyImmediateConfigChanges;
-            ApplyImmediateConfigChanges();
         }
 
         private void ApplyImmediateConfigChanges()
@@ -136,39 +127,31 @@ namespace Player
         
         private static Vector3 GetGroundVel(in RaycastHit hit)
         {
-            if (hit.rigidbody == null) return Vector3.zero;
-            return hit.rigidbody.GetPointVelocity(hit.point);
+            return (hit.rigidbody != null) ? hit.rigidbody.GetPointVelocity(hit.point) : Vector3.zero;
         }
 
         private void ApplyHoverSpring()
         {
+            if (Time.time < _springLockUntil) return; // блок пружины сразу после прыжка
+
             var origin = rb.worldCenterOfMass;
             if (!Physics.Raycast(origin, Vector3.down, out var hit, config.RideHeight + 1f, groundMask, QueryTriggerInteraction.Ignore))
                 return;
 
-            // Ошибка по высоте: >0 — низко (надо вверх), <0 — высоко (чуть тянем вниз по нормали)
-            float error = config.RideHeight - hit.distance;
+            float error = config.RideHeight - hit.distance;           // >0 — ниже целевой высоты
+            if (error <= config.HoverTolerance) return;                // мёртвая зона и запрещаем тянуть вниз
 
-            // Мёртвая зона, чтобы не «дёргалось» на микроколебаниях
-            if (Mathf.Abs(error) < config.HoverTolerance) return;
-
-            // Относительная скорость игрока к поверхности вдоль нормали
             Vector3 groundVel = GetGroundVel(hit);
             float relVelN = Vector3.Dot(rb.linearVelocity - groundVel, hit.normal);
+            relVelN = Mathf.Min(relVelN, 0f);                          // демпфим только движение В СТОРОНУ поверхности
 
-            // Критическое демпфирование: c = 2 * sqrt(k)
             float k = config.SpringK;
-            float c = 2f * Mathf.Sqrt(Mathf.Max(1f, k)); // в Acceleration-формулировке
-
-            // Итоговое "ускорение" пружины вдоль нормали
+            float c = 2f * Mathf.Sqrt(Mathf.Max(1f, k));               // крит. демпфирование
             float accel = (error * k) - (relVelN * c);
-
-            // Ограничение, чтобы не было пиковой «пушки»
-            accel = Mathf.Clamp(accel, -config.MaxSpringAcceleration, config.MaxSpringAcceleration);
+            accel = Mathf.Clamp(accel, 0f, config.MaxSpringAcceleration); // только вверх
 
             rb.AddForce(hit.normal * accel, ForceMode.Acceleration);
 
-            // Реакция на динамическую опору (по желанию)
             if (hit.rigidbody != null && !hit.rigidbody.isKinematic)
                 hit.rigidbody.AddForceAtPosition(-hit.normal * accel, hit.point, ForceMode.Acceleration);
         }
@@ -218,6 +201,7 @@ namespace Player
 
             float jumpVel = Mathf.Sqrt(2f * Mathf.Abs(Physics.gravity.y) * config.JumpHeight);
             rb.AddForce(Vector3.up * jumpVel, ForceMode.VelocityChange);
+            _springLockUntil = Time.time + config.SpringDisableAfterJump;
 
             SwitchState(MotorState.Air);
         }

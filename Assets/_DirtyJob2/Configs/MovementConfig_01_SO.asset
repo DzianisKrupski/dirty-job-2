@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f714fd192834124be8566d1917078ed, type: 3}
   m_Name: MovementConfig_01_SO
   m_EditorClassIdentifier: Assembly-CSharp::Player.MovementConfig
-  moveSpeed: 6
-  accel: 30
-  maxGroundSpeed: 7
+  moveSpeed: 4
+  accel: 20
+  maxGroundSpeed: 4
   airAccel: 8
   maxAirSpeed: 5
-  jumpHeight: 5
+  jumpHeight: 1
   coyoteTime: 0.12
   jumpBuffer: 0.12
   slideMinSpeed: 8
@@ -26,9 +26,10 @@ MonoBehaviour:
   standHeight: 1.8
   crawlHeight: 1
   heightLerpSpeed: 12
-  rideHeight: 0.9
-  springK: 1200
-  hoverTolerance: 1
+  rideHeight: 1.3
+  springK: 60
+  hoverTolerance: 0.01
   maxSpringAcceleration: 60
   groundCheckRadius: 0.25
   maxSlopeAngle: 50
+  springDisableAfterJump: 0.12

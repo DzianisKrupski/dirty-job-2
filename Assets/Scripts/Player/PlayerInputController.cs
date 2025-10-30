@@ -9,6 +9,7 @@ namespace Player
     public struct PlayerInputData
     {
         public Vector2 move;
+        public Vector2 look;
         public bool jump;
         public bool crouch;
         public bool interact;
@@ -19,6 +20,7 @@ namespace Player
         [SerializeField] private PlayerInput playerInput = default!;
         
         private InputAction? _move;
+        private InputAction? _look;
         private InputAction? _jump;
         private InputAction? _crouch;
         private InputAction? _interact;
@@ -29,6 +31,12 @@ namespace Player
         
         public PlayerInputData GetInputs() => _input;
 
+        public void ResetInputs()
+        {
+            _jumpTrigger = false;
+            _interactTrigger = false;
+        }
+
         private void OnEnable()
         {
             if (playerInput != null)
@@ -36,6 +44,7 @@ namespace Player
                 var actions = playerInput.actions;
                 
                 _move = actions.FindAction("Move",true);
+                _look = actions.FindAction("Look",true);
                 _jump = actions.FindAction("Jump",true);
                 _crouch = actions.FindAction("Crouch",true);
                 _interact = actions.FindAction("Interact",true);
@@ -59,8 +68,9 @@ namespace Player
             _input = new PlayerInputData
             {
                 move = _move?.ReadValue<Vector2>() ?? Vector2.zero,
+                look = _look?.ReadValue<Vector2>() ?? Vector2.zero,
                 jump = _jumpTrigger,
-                crouch = _crouch != null && _crouch.ReadValue<bool>(),
+                crouch = _crouch != null && _crouch.IsPressed(),
                 interact = _interactTrigger
             };
         }

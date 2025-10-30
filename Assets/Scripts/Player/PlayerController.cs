@@ -11,11 +11,6 @@ namespace Player
         [SerializeField] private PlayerInputController playerInput = default!;
         [SerializeField] private PlayerMovement movement = default!;
         [SerializeField] private PlayerInteractor interactor = default!;
-
-        private InputAction? _move;
-        private InputAction? _jump;
-        private InputAction? _crouch;
-        private InputAction? _interact;
         
         public event Action<MotorState>? OnStateChanged;
 
@@ -23,8 +18,6 @@ namespace Player
         {
             if (movement != null)
                 movement.OnStateChanged += s => OnStateChanged?.Invoke(s);
-            
-            
         }
 
         private void FixedUpdate()
@@ -40,6 +33,8 @@ namespace Player
             {
                 interactor.TryInteract();
             }
+            
+            playerInput.ResetInputs();
         }
     }
 }

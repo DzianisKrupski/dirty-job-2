@@ -147,6 +147,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2032305509822942757}
   - component: {fileID: 2022195381393216736}
+  - component: {fileID: 3414885241326258621}
   - component: {fileID: 8022025200510761908}
   - component: {fileID: 6590104932688112637}
   - component: {fileID: 5324645779085054668}
@@ -187,9 +188,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c71b0b57d4846d297ebdb9bd8dc90a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerController
-  playerInput: {fileID: 4114852449715820850}
+  playerInput: {fileID: 3414885241326258621}
   movement: {fileID: 8022025200510761908}
   interactor: {fileID: 6590104932688112637}
+--- !u!114 &3414885241326258621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7066533899135885916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4351a32435ed4ea788974a000d88581c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerInputController
+  playerInput: {fileID: 4114852449715820850}
 --- !u!114 &8022025200510761908
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -264,7 +278,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7066533899135885916}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 4ca1b0095ed9fc346b302fac024c61e9, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
