@@ -43,6 +43,7 @@ namespace Player
             if (interactor != null)
             {
                 if(inputData.interact) interactor.TryInteract();
+                if(inputData.throwObject) interactor.TryThrow();
             }
             
             playerInput.ResetInputs();

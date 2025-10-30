@@ -15,6 +15,7 @@ namespace Player
         public bool jump;
         public bool crouch;
         public bool interact;
+        public bool throwObject;
     }
     
     public class PlayerInputController : MonoBehaviour
@@ -26,10 +27,12 @@ namespace Player
         private InputAction? _jump;
         private InputAction? _crouch;
         private InputAction? _interact;
+        private InputAction? _throw;
         private PlayerInputData _input;
 
         private bool _jumpTrigger;
         private bool _interactTrigger;
+        private bool _throwTrigger;
         private Vector2 _moveAccum;
         private Vector2 _lookAccum;
 
@@ -41,6 +44,7 @@ namespace Player
         {
             _jumpTrigger = false;
             _interactTrigger = false;
+            _throwTrigger = false;
             _moveAccum = Vector2.zero;
             _lookAccum = Vector2.zero;
         }
@@ -56,20 +60,24 @@ namespace Player
                 _jump = actions.FindAction("Jump",true);
                 _crouch = actions.FindAction("Crouch",true);
                 _interact = actions.FindAction("Interact",true);
+                _throw = actions.FindAction("Throw",true);
             }
 
             if (_jump != null) _jump.started += OnJumpStarted;
             if (_interact != null) _interact.started += OnInteractStarted;
+            if (_throw != null) _throw.started += OnThrowStarted;
         }
 
         private void OnDisable()
         {
             if (_jump != null) _jump.started -= OnJumpStarted;
             if (_interact != null) _interact.started -= OnInteractStarted;
+            if (_throw != null) _throw.started -= OnThrowStarted;
         }
         
         private void OnJumpStarted(InputAction.CallbackContext ctx) => _jumpTrigger = true;
         private void OnInteractStarted(InputAction.CallbackContext ctx) => _interactTrigger = true;
+        private void OnThrowStarted(InputAction.CallbackContext ctx) => _throwTrigger = true;
 
         private void Update()
         {
@@ -92,7 +100,8 @@ namespace Player
                 lookAccum = _lookAccum,
                 jump = _jumpTrigger,
                 crouch = _crouch != null && _crouch.IsPressed(),
-                interact = _interactTrigger
+                interact = _interactTrigger,
+                throwObject = _throwTrigger
             };
         }
     }

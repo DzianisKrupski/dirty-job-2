@@ -53,6 +53,13 @@ namespace Player
         [SerializeField] private float cameraLerpSpeed = 12f;
         [SerializeField] private float pitchMax = 85f;
         [SerializeField] private float pitchMin = -85f;
+        
+        [Header("Interactor")]
+        [SerializeField] private float useDistance = 3.0f;
+        [SerializeField] private float holdDistance = 1.8f;
+        [SerializeField] private float holdSpring = 90f;
+        [SerializeField] private float holdDamper = 12f;
+        [SerializeField] private float throwImpulse = 12f;
 
         public float MoveSpeed => moveSpeed;
         public float Accel => accel;
@@ -85,6 +92,12 @@ namespace Player
         public float CameraLerpSpeed => cameraLerpSpeed;
         public float PitchMin => pitchMin;
         public float PitchMax => pitchMax;
+        
+        public float UseDistance => useDistance;
+        public float HoldDistance => holdDistance;
+        public float HoldSpring => holdSpring;
+        public float HoldDamper => holdDamper;
+        public float ThrowImpulse => throwImpulse;
 
 #if UNITY_EDITOR
         void OnValidate() => OnChanged?.Invoke(); // моментально дергаем подписчиков в Editor

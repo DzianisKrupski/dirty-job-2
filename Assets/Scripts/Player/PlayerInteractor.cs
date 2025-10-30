@@ -6,14 +6,11 @@ namespace Player
     [DisallowMultipleComponent]
     public sealed class PlayerInteractor : MonoBehaviour
     {
+        [SerializeField] private MovementConfig config = default!;
         [SerializeField] private Rigidbody rb = default!;
         [SerializeField] private Transform cam = default!; // точка взгляда
         [SerializeField] private LayerMask interactMask;
-        [SerializeField] private float useDistance = 3.0f;
-        [SerializeField] private float holdDistance = 1.8f;
-        [SerializeField] private float holdSpring = 90f;
-        [SerializeField] private float holdDamper = 12f;
-        [SerializeField] private float throwImpulse = 12f;
+       
 
         private Rigidbody? _held;
         private ConfigurableJoint? _joint;
@@ -22,7 +19,7 @@ namespace Player
         {
             if (_held != null) { DropHeld(); return; }
 
-            if (Physics.Raycast(cam.position, cam.forward, out var hit, useDistance, interactMask, QueryTriggerInteraction.Ignore))
+            if (Physics.Raycast(cam.position, cam.forward, out var hit, config.UseDistance, interactMask, QueryTriggerInteraction.Ignore))
             {
                 var rbHit = hit.rigidbody;
                 if (rbHit != null && rbHit.mass <= 25f) // ASSUMPTION: лимит массы переносимых предметов
@@ -42,7 +39,7 @@ namespace Player
             // [FIX] Сначала запоминаем тело, *потом* отпускаем, *потом* применяем силу
             var heldBody = _held; 
             DropHeld();
-            heldBody.AddForce(dir * throwImpulse, ForceMode.VelocityChange);
+            heldBody.AddForce(dir * config.ThrowImpulse, ForceMode.VelocityChange);
         }
 
         // [FIX] Принимаем 'hit', чтобы знать точку контакта
@@ -57,7 +54,7 @@ namespace Player
             _joint.autoConfigureConnectedAnchor = false;
             
             // [FIX] Устанавливаем якорь на игроке в *начальную* целевую позицию (в локальных координатах)
-            Vector3 targetPos = cam.position + cam.forward * holdDistance;
+            Vector3 targetPos = cam.position + cam.forward * config.HoldDistance;
             _joint.anchor = transform.InverseTransformPoint(targetPos);
             
             // [FIX] Устанавливаем якорь на объекте в *точку попадания* (в локальных координатах объекта)
@@ -70,7 +67,7 @@ namespace Player
             _joint.angularYMotion = ConfigurableJointMotion.Limited;
             _joint.angularZMotion = ConfigurableJointMotion.Limited;
 
-            Soft(_joint, holdSpring, holdDamper);
+            Soft(_joint, config.HoldSpring, config.HoldDamper);
         }
 
         private void DropHeld()
@@ -90,7 +87,7 @@ namespace Player
         {
             if (_joint == null || _held == null || cam == null) return;
             
-            Vector3 targetPos = cam.position + cam.forward * holdDistance;
+            Vector3 targetPos = cam.position + cam.forward * config.HoldDistance;
             _joint.anchor = transform.InverseTransformPoint(targetPos);
         }
 
