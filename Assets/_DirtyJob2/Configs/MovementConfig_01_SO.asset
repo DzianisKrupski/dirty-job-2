@@ -43,3 +43,8 @@ MonoBehaviour:
   cameraLerpSpeed: 30
   pitchMax: 85
   pitchMin: -85
+  useDistance: 3
+  holdDistance: 1.8
+  holdSpring: 90
+  holdDamper: 12
+  throwImpulse: 4

@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 8283902607607272158}
   - component: {fileID: 1089175060765108719}
   - component: {fileID: 932277124282616888}
+  - component: {fileID: 1554794454223710058}
   m_Layer: 7
   m_Name: Cube_01_PF
   m_TagString: Untagged
@@ -122,7 +123,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1129337112411536125}
   serializedVersion: 5
-  m_Mass: 3
+  m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -239,3 +240,16 @@ MonoBehaviour:
     X: 0
     Y: 0
     Z: 0
+--- !u!114 &1554794454223710058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1129337112411536125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8477e99ae0e4dc88d8e8f435e6acb36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player.InteractableItem
+  rb: {fileID: 8283902607607272158}

@@ -50,8 +50,6 @@ namespace Player
         
         public void Initialize(float yaw, float pitch, LookPhysicsState lookPhysicsState)
         {
-            rb.freezeRotation = true;
-            rb.interpolation = RigidbodyInterpolation.Interpolate;
             SetHeight(config.StandHeight, true);
             SwitchState(MotorState.Air);
 

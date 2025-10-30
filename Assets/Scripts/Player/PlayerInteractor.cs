@@ -1,10 +1,12 @@
 ﻿#nullable enable
+using FishNet.Connection;
+using FishNet.Object;
 using UnityEngine;
 
 namespace Player
 {
     [DisallowMultipleComponent]
-    public sealed class PlayerInteractor : MonoBehaviour
+    public sealed class PlayerInteractor : NetworkBehaviour
     {
         [SerializeField] private MovementConfig config = default!;
         [SerializeField] private Rigidbody rb = default!;
@@ -14,17 +16,43 @@ namespace Player
 
         private Rigidbody? _held;
         private ConfigurableJoint? _joint;
+        
+        [ServerRpc] 
+        private void GiveOwnership(NetworkObject box, NetworkConnection toWho)
+        {
+            box.GiveOwnership(toWho); // короткая аренда: 0.2–0.5 c после последнего толчка
+        }
+    
+        [ServerRpc]
+        private void ReturnToServerAuth(NetworkObject no)
+        {
+            if (no != null)
+                no.RemoveOwnership(); // сервер снова единственный авторитет
+        }
 
         public void TryInteract()
         {
-            if (_held != null) { DropHeld(); return; }
+            if (_held != null)
+            {
+                if(!_held.TryGetComponent<NetworkObject>(out var networkObject) || networkObject.Owner.ClientId != Owner.ClientId)
+                    return;
+                
+                DropHeld(); 
+                ReturnToServerAuth(networkObject);
+                return;
+            }
 
             if (Physics.Raycast(cam.position, cam.forward, out var hit, config.UseDistance, interactMask, QueryTriggerInteraction.Ignore))
             {
                 var rbHit = hit.rigidbody;
                 if (rbHit != null && rbHit.mass <= 25f) // ASSUMPTION: лимит массы переносимых предметов
                 {
+                    if (!rbHit.TryGetComponent<NetworkObject>(out var networkObject) || networkObject.Owner.ClientId != -1) 
+                    {
+                        return;
+                    }
                     // [FIX] Нам нужна информация о 'hit', чтобы знать, куда мы попали
+                    GiveOwnership(networkObject, Owner);
                     Grab(rbHit, hit);
                 }
             }
@@ -40,6 +68,11 @@ namespace Player
             var heldBody = _held; 
             DropHeld();
             heldBody.AddForce(dir * config.ThrowImpulse, ForceMode.VelocityChange);
+            
+            if (heldBody.TryGetComponent<NetworkObject>(out var networkObject) && networkObject.Owner.ClientId == Owner.ClientId)
+            {
+                ReturnToServerAuth(networkObject);
+            }
         }
 
         // [FIX] Принимаем 'hit', чтобы знать точку контакта
