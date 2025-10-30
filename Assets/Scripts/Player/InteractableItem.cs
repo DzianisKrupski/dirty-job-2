@@ -11,7 +11,7 @@ namespace Player
         {
             if (rb == null) rb = GetComponent<Rigidbody>();
             if (rb == null) rb = gameObject.AddComponent<Rigidbody>();
-            rb.mass = 5f;
+            rb.mass = 1f;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
         }
     }

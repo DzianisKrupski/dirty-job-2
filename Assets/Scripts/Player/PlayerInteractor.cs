@@ -25,9 +25,10 @@ namespace Player
             if (Physics.Raycast(cam.position, cam.forward, out var hit, useDistance, interactMask, QueryTriggerInteraction.Ignore))
             {
                 var rbHit = hit.rigidbody;
-                if (rbHit != null && rbHit.mass <= 25f) // // ASSUMPTION: лимит массы переносимых предметов
+                if (rbHit != null && rbHit.mass <= 25f) // ASSUMPTION: лимит массы переносимых предметов
                 {
-                    Grab(rbHit);
+                    // [FIX] Нам нужна информация о 'hit', чтобы знать, куда мы попали
+                    Grab(rbHit, hit);
                 }
             }
         }
@@ -35,22 +36,33 @@ namespace Player
         public void TryThrow()
         {
             if (_held == null) return;
+            
             var dir = cam.forward;
+            
+            // [FIX] Сначала запоминаем тело, *потом* отпускаем, *потом* применяем силу
+            var heldBody = _held; 
             DropHeld();
-            _held?.AddForce(dir * throwImpulse, ForceMode.VelocityChange);
+            heldBody.AddForce(dir * throwImpulse, ForceMode.VelocityChange);
         }
 
-        private void Grab(Rigidbody target)
+        // [FIX] Принимаем 'hit', чтобы знать точку контакта
+        private void Grab(Rigidbody target, RaycastHit hit)
         {
             _held = target;
             _held.interpolation = RigidbodyInterpolation.Interpolate;
-            _held.useGravity = true;
+            _held.useGravity = true; // Гравитация будет давать "ощущение веса"
 
             _joint = gameObject.AddComponent<ConfigurableJoint>();
             _joint.connectedBody = target;
             _joint.autoConfigureConnectedAnchor = false;
-            _joint.anchor = Vector3.zero;
-            _joint.connectedAnchor = Vector3.zero;
+            
+            // [FIX] Устанавливаем якорь на игроке в *начальную* целевую позицию (в локальных координатах)
+            Vector3 targetPos = cam.position + cam.forward * holdDistance;
+            _joint.anchor = transform.InverseTransformPoint(targetPos);
+            
+            // [FIX] Устанавливаем якорь на объекте в *точку попадания* (в локальных координатах объекта)
+            _joint.connectedAnchor = target.transform.InverseTransformPoint(hit.point); 
+            
             _joint.xMotion = ConfigurableJointMotion.Limited;
             _joint.yMotion = ConfigurableJointMotion.Limited;
             _joint.zMotion = ConfigurableJointMotion.Limited;
@@ -65,21 +77,21 @@ namespace Player
         {
             if (_joint != null) Destroy(_joint);
             _joint = null;
+            
+            if (_held != null)
+            {
+                // [FIX] Сбрасываем интерполяцию
+                _held.interpolation = RigidbodyInterpolation.None; 
+            }
             _held = null;
         }
 
         void FixedUpdate()
         {
             if (_joint == null || _held == null || cam == null) return;
-
-            // подтягиваем предмет к цели перед камерой
+            
             Vector3 targetPos = cam.position + cam.forward * holdDistance;
-            Vector3 toTarget = targetPos - _held.worldCenterOfMass;
-            rb.AddForceAtPosition(toTarget * holdSpring, targetPos, ForceMode.Acceleration);
-
-            // демпфирование относительной скорости
-            Vector3 relVel = _held.linearVelocity - rb.linearVelocity;
-            rb.AddForce(-relVel * holdDamper, ForceMode.Acceleration);
+            _joint.anchor = transform.InverseTransformPoint(targetPos);
         }
 
         private static void Soft(ConfigurableJoint j, float s, float d)
