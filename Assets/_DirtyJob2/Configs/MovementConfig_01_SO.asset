@@ -33,3 +33,13 @@ MonoBehaviour:
   groundCheckRadius: 0.25
   maxSlopeAngle: 50
   springDisableAfterJump: 0.12
+  kp: 17.14
+  kd: 5.95
+  maxAngularAccel: 58.6
+  maxAngularVelocity: 77.1
+  lookSensitivity: 0.2
+  eyeHeightStand: 1.6
+  eyeHeightCrawl: 1
+  cameraLerpSpeed: 30
+  pitchMax: 85
+  pitchMin: -85

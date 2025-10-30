@@ -9,7 +9,9 @@ namespace Player
     public struct PlayerInputData
     {
         public Vector2 move;
+        public Vector2 moveAccum;
         public Vector2 look;
+        public Vector2 lookAccum;
         public bool jump;
         public bool crouch;
         public bool interact;
@@ -28,6 +30,10 @@ namespace Player
 
         private bool _jumpTrigger;
         private bool _interactTrigger;
+        private Vector2 _moveAccum;
+        private Vector2 _lookAccum;
+
+        private float _inputDelay;
         
         public PlayerInputData GetInputs() => _input;
 
@@ -35,6 +41,8 @@ namespace Player
         {
             _jumpTrigger = false;
             _interactTrigger = false;
+            _moveAccum = Vector2.zero;
+            _lookAccum = Vector2.zero;
         }
 
         private void OnEnable()
@@ -65,10 +73,23 @@ namespace Player
 
         private void Update()
         {
+            if (_inputDelay < 1f)
+            {
+                _inputDelay += Time.deltaTime;
+                return;
+            }
+
+            Vector2 move = _move?.ReadValue<Vector2>() ?? Vector2.zero;
+            Vector2 look = _look?.ReadValue<Vector2>() ?? Vector2.zero;
+            _moveAccum += move;
+            _lookAccum += look;
+            
             _input = new PlayerInputData
             {
-                move = _move?.ReadValue<Vector2>() ?? Vector2.zero,
-                look = _look?.ReadValue<Vector2>() ?? Vector2.zero,
+                move = move,
+                moveAccum = _moveAccum,
+                look = look,
+                lookAccum = _lookAccum,
                 jump = _jumpTrigger,
                 crouch = _crouch != null && _crouch.IsPressed(),
                 interact = _interactTrigger

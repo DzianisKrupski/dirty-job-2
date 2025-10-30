@@ -21,18 +21,23 @@ namespace Player
         [SerializeField] private LayerMask groundMask;
 
         public event Action<MotorState>? OnStateChanged;
+        public MotorState CurrentState => _state;
 
         private MotorState _state;
         private Vector2 _moveInput;
-        private bool _jumpPressed;
         private bool _crouchHeld;
         private float _springLockUntil;
-
         private float _lastGrounded;
         private float _lastJumpPressed;
         private Vector3 _groundNormal = Vector3.up;
         private bool _isGrounded;
         private readonly RaycastHit[] _hitBuf = new RaycastHit[2];
+        private LookPhysicsState? _lookPhysicsState;
+        
+        private float _deltaYaw;
+        private float _yaw;
+        private float _deltaPitch;
+        private float _pitch;
 
         private void OnEnable()
         {
@@ -42,13 +47,17 @@ namespace Player
         {
             if (config != null) config.OnChanged -= ApplyImmediateConfigChanges;
         }
-
-        private void Awake()
+        
+        public void Initialize(float yaw, float pitch, LookPhysicsState lookPhysicsState)
         {
             rb.freezeRotation = true;
             rb.interpolation = RigidbodyInterpolation.Interpolate;
             SetHeight(config.StandHeight, true);
             SwitchState(MotorState.Air);
+
+            _lookPhysicsState = lookPhysicsState;
+            _yaw = yaw;
+            _pitch = pitch;
         }
 
         private void ApplyImmediateConfigChanges()
@@ -60,17 +69,31 @@ namespace Player
         }
 
         public void SetMoveInput(Vector2 move) => _moveInput = Vector2.ClampMagnitude(move, 1f);
+        
         public void SetJump(bool pressed)
         {
             if (pressed) _lastJumpPressed = Time.time;
-            _jumpPressed = pressed;
         }
         public void SetCrouch(bool held) => _crouchHeld = held;
+        
+        public void SetLookInput(Vector2 look)
+        {
+            _deltaYaw += look.x * config.LookSensitivity;
+            _deltaPitch -= look.y * config.LookSensitivity;
+        }
 
-        void FixedUpdate()
+        public void FixedUpdate()
         {
             UpdateGround();
             ApplyHoverSpring();
+
+            _yaw += _deltaYaw;
+            _deltaYaw = 0f;
+            _deltaPitch = Mathf.Clamp(_deltaPitch, config.PitchMin, config.PitchMax);
+            _pitch = Mathf.Clamp(_pitch + _deltaPitch, -89f, 89f);
+            _deltaPitch = 0f;
+            rb.MoveRotation(Quaternion.Euler(0f, _yaw, 0f));
+            _lookPhysicsState?.PushFixed(_yaw, _pitch);
 
             switch (_state)
             {
@@ -98,7 +121,7 @@ namespace Player
                     if (!_isGrounded) SwitchState(MotorState.Air);
                     break;
             }
-
+            
             UpdateHeight();
         }
 
