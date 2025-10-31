@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Generic;
 using FishNet.Connection;
 using FishNet.Object;
 using UnityEngine;
@@ -11,11 +12,13 @@ namespace Player
         [SerializeField] private MovementConfig config = default!;
         [SerializeField] private Rigidbody rb = default!;
         [SerializeField] private Transform cam = default!; // точка взгляда
+        [SerializeField] private  double ownedTime = 1f;
         [SerializeField] private LayerMask interactMask;
        
 
         private Rigidbody? _held;
         private ConfigurableJoint? _joint;
+        private Dictionary<NetworkObject, double> _removeMap = new Dictionary<NetworkObject, double>();
         
         [ServerRpc] 
         private void GiveOwnership(NetworkObject box, NetworkConnection toWho)
@@ -38,7 +41,7 @@ namespace Player
                     return;
                 
                 DropHeld(); 
-                ReturnToServerAuth(networkObject);
+                Return(networkObject);
                 return;
             }
 
@@ -49,10 +52,15 @@ namespace Player
                 {
                     if (!rbHit.TryGetComponent<NetworkObject>(out var networkObject) || networkObject.Owner.ClientId != -1) 
                     {
-                        return;
+                        if (!_removeMap.ContainsKey(networkObject))
+                        {
+                            return;
+                        }
+
+                        _removeMap.Remove(networkObject);
                     }
                     // [FIX] Нам нужна информация о 'hit', чтобы знать, куда мы попали
-                    GiveOwnership(networkObject, Owner);
+                    networkObject.GiveOwnership(Owner);
                     Grab(rbHit, hit);
                 }
             }
@@ -71,7 +79,33 @@ namespace Player
             
             if (heldBody.TryGetComponent<NetworkObject>(out var networkObject) && networkObject.Owner.ClientId == Owner.ClientId)
             {
-                ReturnToServerAuth(networkObject);
+                Return(networkObject);
+            }
+        }
+
+        private void Return(NetworkObject networkObject)
+        {
+            _removeMap[networkObject] = Time.time;
+        }
+        
+        private void ProcessOwnershipMap()
+        {
+            var time = Time.timeAsDouble;
+            List<NetworkObject> removeList = new List<NetworkObject>(_removeMap.Count);
+        
+            foreach (var kvp in _removeMap)
+            {
+                if (kvp.Value > ownedTime)
+                {
+                    removeList.Add(kvp.Key);
+                    Debug.Log($"Return ownership {kvp.Key} : {time - kvp.Value}");
+                    kvp.Key.RemoveOwnership();
+                }
+            }
+
+            foreach (var remove in removeList)
+            {
+                _removeMap.Remove(remove);
             }
         }
 
@@ -118,6 +152,8 @@ namespace Player
 
         void FixedUpdate()
         {
+            ProcessOwnershipMap();
+            
             if (_joint == null || _held == null || cam == null) return;
             
             Vector3 targetPos = cam.position + cam.forward * config.HoldDistance;
