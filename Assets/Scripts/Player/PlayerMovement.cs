@@ -42,7 +42,11 @@ namespace Player
 
         private void OnEnable()
         {
-            if (config != null) config.OnChanged += ApplyImmediateConfigChanges;
+            if (config != null)
+            {
+                config.OnChanged += ApplyImmediateConfigChanges;
+                rb.maxAngularVelocity = Mathf.Max(rb.maxAngularVelocity, config.MaxAngularVelocity); // запас по угл. скорости
+            }
         }
         private void OnDisable()
         {
@@ -86,12 +90,19 @@ namespace Player
             UpdateGround();
             ApplyHoverSpring();
 
+            // обновляем углы из инпута
+            float yawInputStep = _deltaYaw;          // важно сохранить до обнуления
             _yaw += _deltaYaw;
             _deltaYaw = 0f;
+
             _deltaPitch = Mathf.Clamp(_deltaPitch, config.PitchMin, config.PitchMax);
             _pitch = Mathf.Clamp(_pitch + _deltaPitch, -89f, 89f);
             _deltaPitch = 0f;
-            rb.MoveRotation(Quaternion.Euler(0f, _yaw, 0f));
+
+            // ВМЕСТО rb.MoveRotation(...):
+            ApplyYawPhysics(_yaw, hasInput: Mathf.Abs(yawInputStep) > 0.0001f);
+
+            // Камере сообщаем желаемые углы (yaw целевой, pitch фактический)
             _lookPhysicsState?.PushFixed(_yaw, _pitch);
 
             switch (_state)
@@ -123,6 +134,31 @@ namespace Player
             
             UpdateHeight();
         }
+        private void ApplyYawPhysics(float desiredYawDeg, bool hasInput)
+        {
+            // текущий фактический yaw с Rigidbody
+            float currentYawDeg = rb.rotation.eulerAngles.y;
+
+            // ошибка поворота (короткая дуга), в радианах
+            float errRad = Mathf.DeltaAngle(currentYawDeg, desiredYawDeg) * Mathf.Deg2Rad;
+
+            // проекция угловой скорости на мировую ось Y
+            float omegaY = Vector3.Dot(rb.angularVelocity, Vector3.up);
+
+            // PD-контроллер: τ = Kp*e + Kd*(-ωY)
+            float torque = (config.YawKp * errRad) - (config.YawKd * omegaY);
+            torque = Mathf.Clamp(torque, -config.MaxYawTorque, config.MaxYawTorque);
+
+            rb.AddTorque(Vector3.up * torque, ForceMode.Acceleration);
+
+            // Доп. затухание при отсутствии инпута (плавная стабилизация)
+            if (!hasInput)
+            {
+                Vector3 omegaYVec = Vector3.Project(rb.angularVelocity, Vector3.up);
+                rb.AddTorque(-omegaYVec * config.IdleYawFriction, ForceMode.Acceleration);
+            }
+        }
+        
 
         private void UpdateGround()
         {

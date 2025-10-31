@@ -43,10 +43,13 @@ namespace Player
         [SerializeField] private float springDisableAfterJump = 0.12f;
         
         [Header("PID (yaw)")]
-        [SerializeField] private float kp = 12f;     // пропорциональная (град/с^2 на град ошибки)
-        [SerializeField] private float kd = 2.5f;    // демпфирование (град/с^2 на град/с)
-        [SerializeField] private float maxAngularAccel = 720f; // лимит (град/с^2)
-        [SerializeField] private float maxAngularVelocity = 720f; // лимит (град/с) → сконвертим в рад/с
+        [SerializeField] private float yawKp = 50f;
+        [SerializeField] private float yawKd = 8f;
+        [SerializeField] private float maxYawTorque = 500f;
+        [SerializeField] private float idleYawFriction = 5f; 
+        [SerializeField] private float maxAngularVelocity = 50f; // лимит (град/с) → сконвертим в рад/с
+        
+        
         [SerializeField] private float lookSensitivity = 1.5f;
         [SerializeField] private float eyeHeightStand = 1.6f;
         [SerializeField] private float eyeHeightCrawl = 1.0f;
@@ -82,9 +85,10 @@ namespace Player
         public float GroundCheckRadius => groundCheckRadius;
         public float MaxSlopeAngle => maxSlopeAngle;
         public float SpringDisableAfterJump => springDisableAfterJump;
-        public float Kp => kp;
-        public float Kd => kd;
-        public float MaxAngularAccel => maxAngularAccel;
+        public float YawKp => yawKp;
+        public float YawKd => yawKd;
+        public float MaxYawTorque => maxYawTorque;
+        public float IdleYawFriction => idleYawFriction;
         public float MaxAngularVelocity => maxAngularVelocity; 
         public float LookSensitivity => lookSensitivity;
         public float EyeHeightStand => eyeHeightStand;

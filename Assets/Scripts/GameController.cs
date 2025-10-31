@@ -14,7 +14,9 @@ public class GameController : MonoBehaviour
         _backAction = uiMap.FindAction("Cursor", true);
         _backAction.performed += OnCursorPerformed;
 
+        QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
+        Time.fixedDeltaTime = 1f / 60f;
     }
 
     private void OnDisable()

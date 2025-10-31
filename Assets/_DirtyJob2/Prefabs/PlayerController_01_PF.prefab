@@ -50,6 +50,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c71b0b57d4846d297ebdb9bd8dc90a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player.PlayerController
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: -2772030428367111150}
+  _networkObjectCache: {fileID: 0}
   playerInput: {fileID: 7481728263200117765}
   movement: {fileID: 7465395326395641286}
   interactor: {fileID: 6034081953490943375}
@@ -314,10 +317,6 @@ PrefabInstance:
     - target: {fileID: 3664535084611348796, guid: c0d7165e3231435449bd092b1b93053c, type: 3}
       propertyPath: SerializedTransformProperties.Rotation.z
       value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5324645779085054668, guid: c0d7165e3231435449bd092b1b93053c, type: 3}
-      propertyPath: m_Constraints
-      value: 112
       objectReference: {fileID: 0}
     - target: {fileID: 6590104932688112637, guid: c0d7165e3231435449bd092b1b93053c, type: 3}
       propertyPath: cam
